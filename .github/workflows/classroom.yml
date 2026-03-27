@@ -1,0 +1,109 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn -B package -DskipTests --file pom.xml
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: testEmptyList
+      id: testEmptyList
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: testEmptyList
+        setup-command: ''
+        command: mvn test -Dtest=TestLinkedPositionalList#testEmptyList
+        timeout: 30
+        max-score: 1
+    - name: testAddFirst
+      id: testAddFirst
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: testAddFirst
+        setup-command: ''
+        command: mvn test -Dtest=TestLinkedPositionalList#testAddFirst
+        timeout: 30
+        max-score: 1
+    - name: testAddLast
+      id: testAddLast
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: testAddLast
+        setup-command: ''
+        command: mvn test -Dtest=TestLinkedPositionalList#testAddLast
+        timeout: 30
+        max-score: 1
+    - name: testAddBeforeAfter
+      id: testAddBeforeAfter
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: testAddBeforeAfter
+        setup-command: ''
+        command: mvn test -Dtest=TestLinkedPositionalList#testAddBeforeAfter
+        timeout: 30
+        max-score: 1
+    - name: testSet
+      id: testSet
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: testSet
+        setup-command: ''
+        command: mvn test -Dtest=TestLinkedPositionalList#testSet
+        timeout: 30
+        max-score: 1
+    - name: testRemove
+      id: testRemove
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: testRemove
+        setup-command: ''
+        command: mvn test -Dtest=TestLinkedPositionalList#testRemove
+        timeout: 30
+        max-score: 1
+    - name: testIterator
+      id: testIterator
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: testIterator
+        setup-command: ''
+        command: mvn test -Dtest=TestLinkedPositionalList#testIterator
+        timeout: 30
+        max-score: 2
+    - name: testIterable
+      id: testIterable
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: testIterable
+        setup-command: ''
+        command: mvn test -Dtest=TestLinkedPositionalList#testIterable
+        timeout: 30
+        max-score: 2
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TESTEMPTYLIST_RESULTS: "${{steps.testEmptyList.outputs.result}}"
+        TESTADDFIRST_RESULTS: "${{steps.testAddFirst.outputs.result}}"
+        TESTADDLAST_RESULTS: "${{steps.testAddLast.outputs.result}}"
+        TESTADDBEFOREAFTER_RESULTS: "${{steps.testAddBeforeAfter.outputs.result}}"
+        TESTSET_RESULTS: "${{steps.testSet.outputs.result}}"
+        TESTREMOVE_RESULTS: "${{steps.testRemove.outputs.result}}"
+        TESTITERATOR_RESULTS: "${{steps.testIterator.outputs.result}}"
+        TESTITERABLE_RESULTS: "${{steps.testIterable.outputs.result}}"
+      with:
+        runners: testEmptyList,testAddFirst,testAddLast,testAddBeforeAfter,testSet,testRemove,testIterator,testIterable
